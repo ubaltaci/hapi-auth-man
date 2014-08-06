@@ -1,7 +1,7 @@
 {
     "name": "hapi-auth-man",
     "description": "Cookie authentication plugin with onPostAuth ACL roles and view injection",
-    "version": "0.0.6",
+    "version": "0.0.8",
     "author": {
         "name": "Uğur Baltacı",
         "email": "ugur@kns.com.tr",
@@ -13,7 +13,7 @@
         "web": "http://www.cagdasakar.com"
     },
     "repository": "git://github.com/ubaltaci/hapi-auth-man",
-    "main": "hapi-auth-man",
+    "main": "hapi-auth-man.js",
     "keywords": [
         "hapi",
         "plugin",
