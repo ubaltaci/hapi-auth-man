@@ -10,12 +10,13 @@ var Hoek = require("hoek");
 var Plumber = require("kns-plumber");
 
 // Declare internals
+var internals = {};
+
 internals.defaults = {
     policyRoot: "policies"
 };
 
 exports.register = function (plugin, options, next) {
-
 
     options = Hoek.applyToDefaults(internals.defaults, options);
 
@@ -24,64 +25,71 @@ exports.register = function (plugin, options, next) {
 
     Plumber.pipePolicies(options.policyRoot).then(function (policies) {
         plugin.plugins["hapi-auth-man"].policy = policies;
-
-        // Inserting authenticated user into view context.
-        plugin.ext("onPreResponse", function (request, next) {
-            var response = request.response;
-            // if response type view!
-            if (request.auth && request.auth.isAuthenticated && response.variety && response.variety === 'view') {
-                response.source.context = response.source.context || {};
-                response.source.context.credentials = request.auth.credentials;
-            }
-            return next();
-        });
-
-        // ACL with promises
-        plugin.ext("onPostAuth", function (request, next) {
-
-            var policies = plugin.plugins["hapi-auth-man"].policy;
-            var database = plugin.plugins["hapi-auth-man"].database;
-
-            // Get role & policies
-            var role = request.route.plugins["hapi-auth-man"] && request.route.plugins["hapi-auth-man"].role;
-
-            // Policy and role should exist to check authentication
-            if (!policies || !role) {
-                return next();
-            }
-
-            if (!policies[role]) {
-                return next(Boom.badImplementation(role + " not found in policies."));
-            }
-
-            // Corresponding policies should be array
-            // if length is zero no policy, pass
-            if (policies[role].length == 0) {
-                return next();
-            }
-            else {
-                // Both exists, but is it authenticated ?
-                if (!request.auth || !request.auth.isAuthenticated) {
-                    return next(Boom.unauthorized("You must be authenticated to do this."));
-                }
-
-                Promise.map(policies[role], function (policy) {
-                    return policy(request, database);
-                }).then(function (results) {
-                    if (results && Array.isArray(results) && results.indexOf(false) === -1) {
-                        return next();
-                    }
-                    else {
-                        return next(Boom.unauthorized("You do not have necessary permissions to do this."));
-                    }
-                });
-            }
-        });
-
-        plugin.auth.scheme("cookie", internals.implementation);
-        next();
+        __acl(plugin, next);
+    }).catch(function (e) {
+        console.error(e.message);
+        process.exit(1);
     });
 };
+
+function __acl(plugin, next) {
+
+    // Inserting authenticated user into view context.
+    plugin.ext("onPreResponse", function (request, next) {
+        var response = request.response;
+        // if response type view!
+        if (request.auth && request.auth.isAuthenticated && response.variety && response.variety === 'view') {
+            response.source.context = response.source.context || {};
+            response.source.context.credentials = request.auth.credentials;
+        }
+        return next();
+    });
+
+    // ACL with promises
+    plugin.ext("onPostAuth", function (request, next) {
+
+        var policies = plugin.plugins["hapi-auth-man"].policy;
+        var database = plugin.plugins["hapi-auth-man"].database;
+
+        // Get role & policies
+        var role = request.route.plugins["hapi-auth-man"] && request.route.plugins["hapi-auth-man"].role;
+
+        // Policy and role should exist to check authentication
+        if (!policies || !role) {
+            return next();
+        }
+
+        if (!policies[role]) {
+            return next(Boom.badImplementation(role + " not found in policies."));
+        }
+
+        // Corresponding policies should be array
+        // if length is zero no policy, pass
+        if (policies[role].length == 0) {
+            return next();
+        }
+        else {
+            // Both exists, but is it authenticated ?
+            if (!request.auth || !request.auth.isAuthenticated) {
+                return next(Boom.unauthorized("You must be authenticated to do this."));
+            }
+
+            Promise.map(policies[role], function (policy) {
+                return policy(request, database);
+            }).then(function (results) {
+                if (results && Array.isArray(results) && results.indexOf(false) === -1) {
+                    return next();
+                }
+                else {
+                    return next(Boom.unauthorized("You do not have necessary permissions to do this."));
+                }
+            });
+        }
+    });
+
+    plugin.auth.scheme("cookie", internals.implementation);
+    next();
+}
 
 internals.implementation = function (server, options) {
 

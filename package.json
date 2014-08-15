@@ -1,7 +1,7 @@
 {
     "name": "hapi-auth-man",
     "description": "Cookie authentication plugin with onPostAuth ACL roles and view injection",
-    "version": "0.0.8",
+    "version": "0.1.1",
     "author": {
         "name": "Uğur Baltacı",
         "email": "ugur@kns.com.tr",
@@ -27,7 +27,8 @@
     "dependencies": {
         "boom": "^2.4.2",
         "hoek": "^2.3.0",
-        "bluebird": "^2.2.2"
+        "bluebird": "^2.2.2",
+        "kns-plumber": "0.1.7"
     },
     "devDependencies": {
         "hapi": "^6.2.0",
