@@ -12,18 +12,17 @@ var Plumber = require("kns-plumber");
 // Declare internals
 var internals = {};
 
-internals.defaults = {
-    policyRoot: "policies"
-};
-
 exports.register = function (plugin, options, next) {
 
-    options = Hoek.applyToDefaults(internals.defaults, options);
+    if (!options.policyPath) {
+        console.log("hapi-auth-man: policyPath must be exist in plugin options");
+        process.exit(1);
+    }
 
     plugin.expose("policy", {});
     plugin.expose("database", null);
 
-    Plumber.pipePolicies(options.policyRoot).then(function (policies) {
+    Plumber.pipePolicies(options.policyPath).then(function (policies) {
         plugin.plugins["hapi-auth-man"].policy = policies;
         __acl(plugin, next);
     }).catch(function (e) {
@@ -88,6 +87,7 @@ function __acl(plugin, next) {
     });
 
     plugin.auth.scheme("cookie", internals.implementation);
+
     next();
 }
 
