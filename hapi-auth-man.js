@@ -7,31 +7,18 @@
 var Promise = require("bluebird");
 var Boom = require("boom");
 var Hoek = require("hoek");
-var Plumber = require("kns-plumber");
 
-// Declare internals
 var internals = {};
 
 exports.register = function (plugin, options, next) {
 
-    if (!options.policyPath) {
-        console.log("hapi-auth-man: policyPath must be exist in plugin options");
+    if (!options.database) {
+        console.log("database must be passed in options. [hapi-auth-man]");
         process.exit(1);
     }
 
-    plugin.expose("policy", {});
-    plugin.expose("database", null);
-
-    Plumber.pipePolicies(options.policyPath).then(function (policies) {
-        plugin.plugins["hapi-auth-man"].policy = policies;
-        __acl(plugin, next);
-    }).catch(function (e) {
-        console.error(e.message);
-        process.exit(1);
-    });
-};
-
-function __acl(plugin, next) {
+    var database = options.database;
+    var policy = options.policy;
 
     // Inserting authenticated user into view context.
     plugin.ext("onPreResponse", function (request, next) {
@@ -47,24 +34,21 @@ function __acl(plugin, next) {
     // ACL with promises
     plugin.ext("onPostAuth", function (request, next) {
 
-        var policies = plugin.plugins["hapi-auth-man"].policy;
-        var database = plugin.plugins["hapi-auth-man"].database;
-
         // Get role & policies
         var role = request.route.plugins["hapi-auth-man"] && request.route.plugins["hapi-auth-man"].role;
 
         // Policy and role should exist to check authentication
-        if (!policies || !role) {
+        if (!policy || !role) {
             return next();
         }
 
-        if (!policies[role]) {
+        if (!policy[role]) {
             return next(Boom.badImplementation(role + " not found in policies."));
         }
 
         // Corresponding policies should be array
         // if length is zero no policy, pass
-        if (policies[role].length == 0) {
+        if (policy[role].length == 0) {
             return next();
         }
         else {
@@ -73,7 +57,7 @@ function __acl(plugin, next) {
                 return next(Boom.unauthorized("You must be authenticated to do this."));
             }
 
-            Promise.map(policies[role], function (policy) {
+            Promise.map(policy[role], function (policy) {
                 return policy(request, database);
             }).then(function (results) {
                 if (results && Array.isArray(results) && results.indexOf(false) === -1) {
@@ -87,9 +71,9 @@ function __acl(plugin, next) {
     });
 
     plugin.auth.scheme("cookie", internals.implementation);
-
     next();
-}
+};
+
 
 internals.implementation = function (server, options) {
 
