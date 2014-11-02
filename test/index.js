@@ -24,7 +24,7 @@ describe("Cookie", function () {
     var server = new Hapi.Server();
     before(function (done) {
 
-        server.pack.register(require("../hapi-auth-man.js"), function (err) {
+        server.pack.register(require(".."), function (err) {
 
             expect(err).to.not.exist;
 
@@ -137,7 +137,7 @@ describe("Cookie", function () {
     it("does not clear a request with invalid session", function (done) {
 
         var server = new Hapi.Server();
-        server.pack.register(require("../hapi-auth-man.js"), function (err) {
+        server.pack.register(require(".."), function (err) {
 
             expect(err).to.not.exist;
 
@@ -196,7 +196,7 @@ describe("Cookie", function () {
     it("logs in and authenticates a request", function (done) {
 
         var server = new Hapi.Server();
-        server.pack.register(require("../hapi-auth-man.js"), function (err) {
+        server.pack.register(require(".."), function (err) {
 
             expect(err).to.not.exist;
 
@@ -248,7 +248,7 @@ describe("Cookie", function () {
     it("errors in validation function", function (done) {
 
         var server = new Hapi.Server();
-        server.pack.register(require("../hapi-auth-man.js"), function (err) {
+        server.pack.register(require(".."), function (err) {
 
             expect(err).to.not.exist;
 
@@ -300,7 +300,7 @@ describe("Cookie", function () {
     it("authenticates a request (no ttl)", function (done) {
 
         var server = new Hapi.Server();
-        server.pack.register(require("../hapi-auth-man.js"), function (err) {
+        server.pack.register(require(".."), function (err) {
 
             expect(err).to.not.exist;
 
@@ -345,7 +345,7 @@ describe("Cookie", function () {
     it("authenticates a request (no session override)", function (done) {
 
         var server = new Hapi.Server();
-        server.pack.register(require("../hapi-auth-man.js"), function (err) {
+        server.pack.register(require(".."), function (err) {
 
             expect(err).to.not.exist;
 
@@ -401,7 +401,7 @@ describe("Cookie", function () {
     it("errors on missing session in set()", function (done) {
 
         var server = new Hapi.Server();
-        server.pack.register(require("../hapi-auth-man.js"), function (err) {
+        server.pack.register(require(".."), function (err) {
 
             expect(err).to.not.exist;
 
@@ -443,7 +443,7 @@ describe("Cookie", function () {
         it("sends to login page (uri without query)", function (done) {
 
             var server = new Hapi.Server();
-            server.pack.register(require("../hapi-auth-man.js"), function (err) {
+            server.pack.register(require(".."), function (err) {
 
                 expect(err).to.not.exist;
 
@@ -473,7 +473,7 @@ describe("Cookie", function () {
         it("skips when route override", function (done) {
 
             var server = new Hapi.Server();
-            server.pack.register(require("../hapi-auth-man.js"), function (err) {
+            server.pack.register(require(".."), function (err) {
 
                 expect(err).to.not.exist;
 
@@ -511,7 +511,7 @@ describe("Cookie", function () {
         it("skips when redirectOnTry is false in try mode", function (done) {
 
             var server = new Hapi.Server();
-            server.pack.register(require("../hapi-auth-man.js"), function (err) {
+            server.pack.register(require(".."), function (err) {
 
                 expect(err).to.not.exist;
 
@@ -544,7 +544,7 @@ describe("Cookie", function () {
         it("sends to login page (uri with query)", function (done) {
 
             var server = new Hapi.Server();
-            server.pack.register(require("../hapi-auth-man.js"), function (err) {
+            server.pack.register(require(".."), function (err) {
 
                 expect(err).to.not.exist;
 
@@ -574,7 +574,7 @@ describe("Cookie", function () {
         it("sends to login page and does not append the next query when appendNext is false", function (done) {
 
             var server = new Hapi.Server();
-            server.pack.register(require("../hapi-auth-man.js"), function (err) {
+            server.pack.register(require(".."), function (err) {
 
                 expect(err).to.not.exist;
 
@@ -604,7 +604,7 @@ describe("Cookie", function () {
         it("redirect on try", function (done) {
 
             var server = new Hapi.Server();
-            server.pack.register(require("../hapi-auth-man.js"), function (err) {
+            server.pack.register(require(".."), function (err) {
 
                 expect(err).to.not.exist;
 
